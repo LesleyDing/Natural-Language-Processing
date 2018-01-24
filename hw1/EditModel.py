@@ -46,9 +46,9 @@ class EditModel(object):
     ret = []
     for i in xrange(1, len(word)):
       #The corrupted signal are this character and the character preceding
-      corruptLetters = word[i-1:i+1] 
+      corruptLetters = word[i-1:i+1]                                               #output <h, <
       #The correct signal is just the preceding character
-      correctLetters = corruptLetters[:-1]
+      correctLetters = corruptLetters[:-1]                                         #output hi, h
 
       #The corrected word deletes character i (and lacks the start symbol)
       correction = "%s%s" % (word[1:i], word[i+1:])
@@ -63,14 +63,41 @@ class EditModel(object):
     # Tip: If inserting the letter 'a' as the second character in the word 'test', the corrupt
     #      signal is 't' and the correct signal is 'ta'. See slide 17 of the noisy channel model.
     word = "<" + word # append start token
-    return []
+    ret = []
+    for i in xrange(0, len(word)):
+      for j in xrange(0, len(EditModel.ALPHABET)):
+        #The corrupted signal is this character
+        corruptLetters = word[i] 
+        #The correct signal is this character and the inserted letter
+        correctLetters = corruptLetters + EditModel.ALPHABET[j]
+        #The corrected word inserts character (and lacks the start symbol)
+        correction = "%s%s%s" % (word[1:i+1], EditModel.ALPHABET[j], word[i+1:])
+        ret.append(Edit(correction, corruptLetters, correctLetters))
+    
+    return ret
 
   def transposeEdits(self, word):
     """Returns a list of edits of 1-transpose distance words and rules used to generate them."""
     # TODO: write this
     # Tip: If tranposing letters 'te' in the word 'test', the corrupt signal is 'te'
     #      and the correct signal is 'et'. See slide 17 of the noisy channel model.
-    return []
+    if len(word) <= 0:
+      return []
+    
+    ret = []
+    for i in xrange(0, len(word)):
+      for j in xrange(0, len(word)):
+        if i < j: #Make sure the transposation between two letters only happened once
+          #The corrupted signal are two transposed letters in original order
+          corruptLetters = "%s%s" % (word[i], word[j])
+          #The correct signal are two transposed letters in transposed order
+          correctLetters = "%s%s" % (word[j], word[i])
+          #The corrected word switchs the position of two letters
+          correction = "%s%s%s%s%s" % (word[0:i], word[j], word[i+1:j], word[i], word[j+1:])
+          ret.append(Edit(correction, corruptLetters, correctLetters))
+    
+    return ret
+
 
   def replaceEdits(self, word):
     """Returns a list of edits of 1-replace distance words and rules used to generate them."""
@@ -78,7 +105,22 @@ class EditModel(object):
     # Tip: you might find EditModel.ALPHABET helpful
     # Tip: If replacing the letter 'e' with 'q' in the word 'test', the corrupt signal is 'e'
     #      and the correct signal is 'q'. See slide 17 of the noisy channel model.
-    return []
+    if len(word) <= 0:
+      return []
+    
+    ret = []
+    for i in xrange(0, len(word)):
+      for j in xrange(0, len(EditModel.ALPHABET)):
+        if word[i] != EditModel.ALPHABET[j]:
+          #The corrupted signal is this character
+          corruptLetters = word[i] 
+          #The correct signal is new letter
+          correctLetters = EditModel.ALPHABET[j]
+          #The corrected word replaces character
+          correction = "%s%s%s" % (word[0:i], EditModel.ALPHABET[j], word[i+1:])
+          ret.append(Edit(correction, corruptLetters, correctLetters))
+    
+    return ret
 
   def edits(self, word):
     """Returns a list of tuples of 1-edit distance words and rules used to generate them, e.g. ("test", "te|et")"""
