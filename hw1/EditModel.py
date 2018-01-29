@@ -86,15 +86,14 @@ class EditModel(object):
     
     ret = []
     for i in xrange(0, len(word)):
-      for j in xrange(0, len(word)):
-        if i < j: #Make sure the transposation between two letters only happened once
-          #The corrupted signal are two transposed letters in original order
-          corruptLetters = "%s%s" % (word[i], word[j])
-          #The correct signal are two transposed letters in transposed order
-          correctLetters = "%s%s" % (word[j], word[i])
-          #The corrected word switchs the position of two letters
-          correction = "%s%s%s%s%s" % (word[0:i], word[j], word[i+1:j], word[i], word[j+1:])
-          ret.append(Edit(correction, corruptLetters, correctLetters))
+      if i + 1 < len(word):
+        #The corrupted signal are two transposed letters in original order
+        corruptLetters = "%s%s" % (word[i], word[i+1])
+        #The correct signal are two transposed letters in transposed order
+        correctLetters = "%s%s" % (word[i+1], word[i])
+        #The corrected word switchs the position of two letters
+        correction = "%s%s%s%s" % (word[0:i], word[i+1], word[i], word[i+2:])
+        ret.append(Edit(correction, corruptLetters, correctLetters))
     
     return ret
 

@@ -42,24 +42,17 @@ class SpellCorrect:
       #      You should iterate through these values instead of enumerating all edits.
       # Tip: self.languageModel.score(trialSentence) gives log-probability of a sentence
       
-# pass the empty word
-# if sentence[i] == "":
-#   continue
       # Get candidate edits and log-probabilities
       edits = self.editModel.editProbabilities(sentence[i])
       # Try each of candidate edits
-      if len(edits) == 0:
-        bestSentence = sentence[:]
-        bestScore = self.languageModel.score(bestSentence)
-        continue
       for j in xrange(0, len(edits)):
-        if sentence[i] != edits[j][0]:
-          trialSentence = sentence[:]
-          trialSentence[i] = edits[j][0]
-          trialScore = self.languageModel.score(trialSentence)
-          if bestScore < trialScore:
-            bestScore = trialScore
-            bestSentence = trialSentence
+        # if sentence[i] != edits[j][0]:
+        trialSentence = sentence[:]
+        trialSentence[i] = edits[j][0]
+        trialScore = self.languageModel.score(trialSentence) + edits[j][1]
+        if bestScore < trialScore:
+          bestScore = trialScore
+          bestSentence = trialSentence
     return bestSentence
 
   def evaluate(self, corpus):  
@@ -111,29 +104,29 @@ def main():
   uniformOutcome = uniformSpell.evaluate(devCorpus) 
   print str(uniformOutcome)
 
-  # print 'Smooth Unigram Language Model: ' 
-  # smoothUnigramLM = SmoothUnigramModel(trainingCorpus)
-  # smoothUnigramSpell = SpellCorrect(smoothUnigramLM, trainingCorpus)
-  # smoothUnigramOutcome = smoothUnigramSpell.evaluate(devCorpus)
-  # print str(smoothUnigramOutcome)
+  print 'Smooth Unigram Language Model: ' 
+  smoothUnigramLM = SmoothUnigramModel(trainingCorpus)
+  smoothUnigramSpell = SpellCorrect(smoothUnigramLM, trainingCorpus)
+  smoothUnigramOutcome = smoothUnigramSpell.evaluate(devCorpus)
+  print str(smoothUnigramOutcome)
 
-  # print 'Smooth Bigram Language Model: '
-  # smoothBigramLM = SmoothBigramModel(trainingCorpus)
-  # smoothBigramSpell = SpellCorrect(smoothBigramLM, trainingCorpus)
-  # smoothBigramOutcome = smoothBigramSpell.evaluate(devCorpus)
-  # print str(smoothBigramOutcome)
+  print 'Smooth Bigram Language Model: '
+  smoothBigramLM = SmoothBigramModel(trainingCorpus)
+  smoothBigramSpell = SpellCorrect(smoothBigramLM, trainingCorpus)
+  smoothBigramOutcome = smoothBigramSpell.evaluate(devCorpus)
+  print str(smoothBigramOutcome)
 
-  # print 'Backoff Language Model: '
-  # backoffLM = BackoffModel(trainingCorpus)
-  # backoffSpell = SpellCorrect(backoffLM, trainingCorpus)
-  # backoffOutcome = backoffSpell.evaluate(devCorpus)
-  # print str(backoffOutcome)
+  print 'Backoff Language Model: '
+  backoffLM = BackoffModel(trainingCorpus)
+  backoffSpell = SpellCorrect(backoffLM, trainingCorpus)
+  backoffOutcome = backoffSpell.evaluate(devCorpus)
+  print str(backoffOutcome)
 
-  # print 'Custom Language Model: '
-  # customLM = CustomModel(trainingCorpus)
-  # customSpell = SpellCorrect(customLM, trainingCorpus)
-  # customOutcome = customSpell.evaluate(devCorpus)
-  # print str(customOutcome)
+  print 'Custom Language Model: '
+  customLM = CustomModel(trainingCorpus)
+  customSpell = SpellCorrect(customLM, trainingCorpus)
+  customOutcome = customSpell.evaluate(devCorpus)
+  print str(customOutcome)
 
 if __name__ == "__main__":
     main()
